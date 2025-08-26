@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Student Portal</title>
+  <style>
+    :root{
+      --primary:#2c7be5;
+      --muted:#666;
+      --bg:#f4f7fb;
+      --card:#fff;
+      --maxw:900px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
+      background:var(--bg);
+      color:#222;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height:100vh;
+      padding:24px;
+    }
+    .container{
+      width:100%;
+      max-width:var(--maxw);
+      background:var(--card);
+      border-radius:10px;
+      box-shadow:0 8px 30px rgba(20,30,60,.08);
+      overflow:hidden;
+      display:grid;
+      grid-template-columns: 360px 1fr;
+      gap:0;
+    }
+    .panel{
+      padding:28px;
+      background:linear-gradient(180deg,#ffffff 0%, #fbfdff 100%);
+      border-right:1px solid #eef4ff;
+    }
+    h1{font-size:20px;margin:0 0 8px}
+    p.lead{margin:0 0 18px;color:var(--muted);font-size:14px}
+
+    .tabs{display:flex;gap:8px;margin-bottom:18px}
+    .tab{
+      flex:1;
+      text-align:center;
+      padding:8px 10px;
+      border-radius:8px;
+      cursor:pointer;
+      background:#f3f8ff;
+      color:var(--primary);
+      font-weight:600;
+    }
+    .tab.active{background:var(--primary); color:white}
+
+    form{display:block}
+    .field{margin-bottom:12px}
+    .field label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+    .field input, .field select, .field textarea{
+      width:100%;
+      padding:10px 12px;
+      border-radius:8px;
+      border:1px solid #e6eefb;
+      background:#fff;
+      font-size:14px;
+    }
+    .actions{display:flex;gap:8px;align-items:center;margin-top:12px}
+    button.primary{
+      background:var(--primary);
+      color:white;
+      border:0;
+      padding:10px 14px;
+      border-radius:8px;
+      cursor:pointer;
+      font-weight:600;
+    }
+    button.ghost{
+      background:transparent;
+      border:1px solid #dfeafc;
+      padding:10px 14px;
+      border-radius:8px;
+      cursor:pointer;
+      color:var(--muted);
+    }
+    small.msg{display:block;margin-top:8px;color:#b03}
+
+    /* right pane - dashboard */
+    .main{
+      padding:28px;
+      min-height:420px;
+    }
+    .placeholder{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      height:100%;
+      color:var(--muted);
+      text-align:center;
+      border:2px dashed #eef6ff;
+      border-radius:8px;
+      padding:20px;
+    }
+
+    .profile{
+      display:grid;
+      grid-template-columns:120px 1fr;
+      gap:18px;
+      align-items:center;
+    }
+    .avatar{
+      width:120px;height:120px;border-radius:8px;background:#eef6ff;
+      display:flex;align-items:center;justify-content:center;overflow:hidden;
+    }
+    .avatar img{width:100%;height:100%;object-fit:cover;display:block}
+    .info h2{margin:0;font-size:18px}
+    .info p{margin:6px 0;color:var(--muted)}
+
+    .grid{
+      margin-top:18px;
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+      gap:12px;
+    }
+    .card{
+      background:#fafcff;
+      border-radius:8px;padding:12px;
+      border:1px solid #eef6ff;
+    }
+    .label{font-size:12px;color:var(--muted);margin-bottom:6px;display:block}
+    .val{font-weight:700}
+
+    .topbar{
+      display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;
+    }
+    .logout{background:#f8f8f8;border:1px solid #eee;padding:8px 10px;border-radius:8px;cursor:pointer}
+
+    /* responsive */
+    @media (max-width:880px){
+      .container{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <div class="container" role="application">
+    <aside class="panel" aria-label="Authentication panel">
+      <h1>Student Portal</h1>
+      <p class="lead">Login or register to view student details.</p>
+
+      <div class="tabs" role="tablist" aria-label="Auth tabs">
+        <div class="tab active" id="tab-login" role="tab" aria-selected="true">Login</div>
+        <div class="tab" id="tab-register" role="tab" aria-selected="false">Register</div>
+      </div>
+
+      <div id="login-panel">
+        <form id="loginForm" autocomplete="off" novalidate>
+          <div class="field">
+            <label for="login-username">User ID or Email</label>
+            <input id="login-username" name="username" type="text" placeholder="e.g. student01" required>
+          </div>
+          <div class="field">
+            <label for="login-password">Password</label>
+            <input id="login-password" name="password" type="password" placeholder="Your password" required>
+          </div>
+          <div class="actions">
+            <button type="submit" class="primary">Login</button>
+            <button type="button" id="to-register" class="ghost">Create account</button>
+          </div>
+          <small class="msg" id="login-msg" aria-live="polite"></small>
+        </form>
+      </div>
+
+      <div id="register-panel" style="display:none">
+        <form id="registerForm" autocomplete="off" novalidate>
+          <div class="field">
+            <label for="reg-name">Full name</label>
+            <input id="reg-name" name="name" type="text" placeholder="Ishu" required>
+          </div>
+          <div class="field">
+            <label for="reg-email">Email</label>
+            <input id="reg-email" name="email" type="email" placeholder="email@example.com" required>
+          </div>
+          <div class="field">
+            <label for="reg-pass">Password</label>
+            <input id="reg-pass" name="password" type="password" placeholder="Choose a password" required>
+          </div>
+          <div class="field">
+            <label for="reg-photo">Photo URL (optional)</label>
+            <input id="reg-photo" name="photo" type="url" placeholder="https://...">
+          </div>
+          <div class="actions">
+            <button type="submit" class="primary">Register</button>
+            <button type="button" id="to-login" class="ghost">Back to login</button>
+          </div>
+          <small class="msg" id="reg-msg" aria-live="polite"></small>
+        </form>
+      </div>
+    </aside>
+
+    <main class="main" id="main">
+      <div class="topbar">
+        <div>
+          <strong id="welcome-title">Welcome</strong>
+          <div style="font-size:13px;color:var(--muted)">Student dashboard preview</div>
+        </div>
+        <div>
+          <button id="logoutBtn" class="logout" style="display:none">Logout</button>
+        </div>
+      </div>
+
+      <div id="content">
+        <div class="placeholder" id="placeholder">
+          Please log in or register to view student information.
+        </div>
+
+        <div id="dashboard" style="display:none">
+          <div class="profile">
+            <div class="avatar" id="avatar">
+              <img src="" alt="Student photo" id="avatarImg" style="display:none">
+              <div id="avatarInitial" style="font-weight:700;color:var(--primary);font-size:28px"></div>
+            </div>
+            <div class="info">
+              <h2 id="stuName">Student Name</h2>
+              <p id="stuEmail">student@example.com</p>
+              <p style="margin:6px 0;color:var(--muted)">Role: <span id="stuRole" class="val">Student</span></p>
+            </div>
+          </div>
+
+          <div class="grid">
+            <div class="card">
+              <span class="label">Roll Number</span>
+              <div class="val" id="stuRoll">-</div>
+            </div>
+            <div class="card">
+              <span class="label">Mobile</span>
+              <div class="val" id="stuMobile">-</div>
+            </div>
+            <div class="card">
+              <span class="label">Subjects</span>
+              <div class="val" id="stuSubjects">-</div>
+            </div>
+            <div class="card">
+              <span class="label">Remarks</span>
+              <div class="val" id="stuRemarks">-</div>
+            </div>
+          </div>
+
+          <div style="margin-top:18px">
+            <button class="primary" id="printBtn">Print</button>
+            <button class="ghost" id="editBtn">Edit (local)</button>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Simple in-memory "database" of users (for demo only)
+    const store = {
+      users: [
+        // sample user (password stored in plain text for demo only)
+        { id: "student01", name: "Amit Kumar", email: "amit@example.com", password: "pass123", photo: "", roll: "101", mobile: "9876543210", subjects: "Math,Science,English", remarks: "Good" }
+      ],
+      current: null
+    };
+
+    // Tabs and panel switching
+    const tabLogin = document.getElementById('tab-login');
+    const tabRegister = document.getElementById('tab-register');
+    const loginPanel = document.getElementById('login-panel');
+    const registerPanel = document.getElementById('register-panel');
+
+    function activateTab(which){
+      if(which==='login'){
+        tabLogin.classList.add('active');
+        tabRegister.classList.remove('active');
+        loginPanel.style.display = '';
+        registerPanel.style.display = 'none';
+      } else {
+        tabLogin.classList.remove('active');
+        tabRegister.classList.add('active');
+        loginPanel.style.display = 'none';
+        registerPanel.style.display = '';
+      }
+    }
+
+    tabLogin.addEventListener('click', ()=>activateTab('login'));
+    tabRegister.addEventListener('click', ()=>activateTab('register'));
+    document.getElementById('to-register').addEventListener('click', ()=>activateTab('register'));
+    document.getElementById('to-login').addEventListener('click', ()=>activateTab('login'));
+
+    // Register form
+    const registerForm = document.getElementById('registerForm');
+    const regMsg = document.getElementById('reg-msg');
+    registerForm.addEventListener('submit', (ev)=>{
+      ev.preventDefault();
+      regMsg.textContent = '';
+      const name = document.getElementById('reg-name').value.trim();
+      const email = document.getElementById('reg-email').value.trim();
+      const pass = document.getElementById('reg-pass').value;
+      const photo = document.getElementById('reg-photo').value.trim();
+
+      if(!name || !email || !pass){
+        regMsg.textContent = 'Please fill all required fields.';
+        return;
+      }
+
+      // simple uniqueness check by email
+      if(store.users.some(u=>u.email.toLowerCase()===email.toLowerCase())){
+        regMsg.textContent = 'An account with this email already exists.';
+        return;
+      }
+
+      // create user id (simple)
+      const id = 'stu' + (1000 + (store.users.length + 1));
+      const user = { id, name, email, password: pass, photo, roll: String(100 + store.users.length), mobile: "", subjects: "", remarks: ""};
+      store.users.push(user);
+      regMsg.style.color = 'green';
+      regMsg.textContent = 'Account created. You can now login.';
+      setTimeout(()=>{ regMsg.textContent=''; activateTab('login'); }, 1200);
+      registerForm.reset();
+    });
+
+    // Login form
+    const loginForm = document.getElementById('loginForm');
+    const loginMsg = document.getElementById('login-msg');
+
+    loginForm.addEventListener('submit', (ev)=>{
+      ev.preventDefault();
+      loginMsg.textContent = '';
+      const username = document.getElementById('login-username').value.trim();
+      const password = document.getElementById('login-password').value;
+
+      if(!username || !password){
+        loginMsg.textContent = 'Enter username/email and password.';
+        return;
+      }
+
+      // find by id or email
+      const user = store.users.find(u => (u.id.toLowerCase()===username.toLowerCase()) || (u.email.toLowerCase()===username.toLowerCase()));
+      if(!user || user.password !== password){
+        loginMsg.textContent = 'Invalid credentials.';
+        return;
+      }
+
+      // success
+      store.current = user;
+      loginMsg.textContent = '';
+      showDashboard(user);
+      document.getElementById('logoutBtn').style.display = '';
+    });
+
+    // Dashboard rendering
+    function showDashboard(user){
+      document.getElementById('placeholder').style.display = 'none';
+      const dash = document.getElementById('dashboard');
+      dash.style.display = '';
+      document.getElementById('welcome-title').textContent = 'Hello, ' + user.name.split(' ')[0];
+      document.getElementById('stuName').textContent = user.name;
+      document.getElementById('stuEmail').textContent = user.email;
+      document.getElementById('stuRoll').textContent = user.roll || '-';
+      document.getElementById('stuMobile').textContent = user.mobile || '-';
+      document.getElementById('stuSubjects').textContent = user.subjects || '-';
+      document.getElementById('stuRemarks').textContent = user.remarks || '-';
+
+      const avatarImg = document.getElementById('avatarImg');
+      const avatarInitial = document.getElementById('avatarInitial');
+      if(user.photo){
+        avatarImg.src = user.photo;
+        avatarImg.style.display = '';
+        avatarInitial.style.display = 'none';
+      } else {
+        avatarImg.style.display = 'none';
+        avatarInitial.style.display = '';
+        avatarInitial.textContent = user.name.split(' ').map(n=>n[0]).slice(0,2).join('').toUpperCase();
+      }
+      document.getElementById('logoutBtn').style.display = '';
+    }
+
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', ()=>{
+      store.current = null;
+      document.getElementById('dashboard').style.display = 'none';
+      document.getElementById('placeholder').style.display = '';
+      document.getElementById('welcome-title').textContent = 'Welcome';
+      document.getElementById('logoutBtn').style.display = 'none';
+      activateTab('login');
+    });
+
+    // Print
+    document.getElementById('printBtn').addEventListener('click', ()=>{
+      window.print();
+    });
+
+    // Simple edit (local only)
+    document.getElementById('editBtn').addEventListener('click', ()=>{
+      if(!store.current) return alert('Login first.');
+      const newMobile = prompt('Enter mobile number', store.current.mobile || '');
+      if(newMobile !== null){
+        store.current.mobile = newMobile.trim();
+        showDashboard(store.current);
+        alert('Saved (in local memory only).');
+      }
+    });
+
+    // Initialize (no user logged in)
+    (function init(){
+      // Optionally show a sample logged-out state
+    })();
+  </script>
+</body>
+</html>
+
+   
